@@ -1,0 +1,128 @@
+
+<form [formGroup]="formGroup">
+    <sky-fluid-grid [disableMargin]="false" gutterSize="medium">      
+      <sky-row>
+        <sky-column [screenSmall]="3" [screenMedium]="2">
+            <sky-radio-group formControlName="modeOptionControl" headingText="Toggle Daily/Hourly">
+                <ul class="sky-list-unstyled">
+                  <li *ngFor="let option of modeOptions">
+                    <sky-radio
+                      [disabled]="option.disabled"
+                      [value]="option.value"
+                      [labelText]="option.name"
+                    />
+                  </li>
+                </ul>
+              </sky-radio-group>
+        </sky-column>
+        <sky-column [screenSmall]="3" [screenMedium]="2">
+            <sky-radio-group formControlName="temparatureUnitsControl" headingText="Temperture Units">
+                <ul class="sky-list-unstyled">
+                  <li *ngFor="let option of temparatureUnitsOptions">
+                    <sky-radio
+                      [disabled]="option.disabled"
+                      [value]="option.value"
+                      [labelText]="option.name"
+                    />
+                  </li>
+                </ul>
+              </sky-radio-group>
+        </sky-column>
+        <sky-column [screenSmall]="3" [screenMedium]="2">
+            <sky-radio-group formControlName="precipitationUnitsControl" headingText="Precipitation Units">
+                <ul class="sky-list-unstyled">
+                  <li *ngFor="let option of precipitationUnitsOptions">
+                    <sky-radio
+                      [disabled]="option.disabled"
+                      [value]="option.value"
+                      [labelText]="option.name"
+                    />
+                  </li>
+                </ul>
+              </sky-radio-group>
+        </sky-column>
+        <sky-column [screenSmall]="3" [screenMedium]="2">
+          <sky-input-box
+            data-sky-id="input-box-latitude"
+            labelText="Latitude"
+            stacked="true"
+          >
+            <input formControlName="latitude" value ="latitude" spellcheck="false" type="text" />
+          </sky-input-box>
+        </sky-column>
+        <sky-column [screenSmall]="3" [screenMedium]="2">
+          <sky-input-box
+            data-sky-id="input-box-longtitude"
+            labelText="Longitude"
+            stacked="true"
+          >
+            <input
+              class="input-box-longtitude"
+              formControlName="longitude"
+              value ="longitude"              
+              spellcheck="false"
+              type="text"
+            />
+          </sky-input-box>
+        </sky-column>        
+        <sky-column [screenSmall]="5" [screenMedium]="2" >            
+            <button type="button" class="sky-btn sky-btn-icon-borderless" aria-label="Borderless icon action" (click)="getCurrentLocation()">
+                <sky-icon icon="map-marker" size="4x"/>
+            </button>      
+        </sky-column> 
+      </sky-row>
+      <br>
+      <sky-row>
+        <sky-column [screenMedium]="5" > 
+        <sky-date-range-picker
+        formControlName="weatherDateRangeControl"
+        hintText="Shows the weather report for selected date range."
+        label="Forecast Days"   
+        [dateFormat]="dateFormat"     
+        />   
+        <ng-container *ngIf="reactiveRange?.errors && reactiveRange?.touched">
+            <div
+            *ngIf="
+                reactiveRange?.errors?.['skyDateRange']?.errors
+                .endDateBeforeStartDate
+            "
+            class="sky-error-label"
+            >
+            Change the date range so that the from date is on or before the to
+            date.
+            </div>
+            <div *ngIf="reactiveRange?.errors?.['skyDate']" class="sky-error-label">
+            Enter valid dates.
+            </div>            
+        </ng-container>    
+        </sky-column>       
+      </sky-row>
+      <br>
+      <sky-row>
+        <sky-column [screenSmall]="5" [screenMedium]="3" >       
+            <button class="sky-btn sky-btn-primary" type="submit" (click)="loadWeatherData()">Load</button>                   
+        </sky-column>         
+      </sky-row>  
+      <br>    
+      <sky-row>
+        <sky-column [screenSmall]="5" [screenMedium]="3" >       
+        <sky-alert alertType="danger" *ngIf ="isShowAlert" [closeable]="true" class="sky-margin-stacked-sm"  gutterSize="small">Please enter Latitude and Longitude</sky-alert>
+        <sky-alert alertType="danger" *ngIf ="isShowAlertForDateRange" [closeable]="true" class="sky-margin-stacked-sm"  gutterSize="small">Date range cannot be "At any time"</sky-alert>
+        </sky-column>
+      </sky-row>
+    </sky-fluid-grid>
+    </form>            
+    <sky-ag-grid-wrapper *ngIf = "isShowGrid">
+        <ag-grid-angular [gridOptions]="gridOptions" [rowData]="weatherForecastList" />
+        <sky-alert alertType="info" class="sky-margin-stacked-lg">Using viewer's current timezone.</sky-alert>
+        <sky-paging
+        [currentPage]="currentPage"
+        [itemCount]="weatherForecastList.length"
+        [pageSize]="pageSize"
+        (currentPageChange)="onPageChange($event)"
+        />    
+    </sky-ag-grid-wrapper>    
+        
+   
+
+

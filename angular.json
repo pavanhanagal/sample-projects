@@ -28,7 +28,8 @@
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
-              "zone.js"
+              "zone.js",
+              "@skyux/packages/polyfills"
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -37,22 +38,29 @@
               "src/assets"
             ],
             "styles": [
+              "@skyux/ag-grid/css/sky-ag-grid.css",
+              "@skyux/theme/css/sky.css",
+              "@skyux/theme/css/themes/modern/styles.css",
               "src/styles.scss"
             ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "server.ts"
-            }
+            "scripts": [],           
+            "allowedCommonJsDependencies": [
+              "@skyux/icons",
+              "autonumeric",
+              "dom-autoscroller",
+              "dragula",
+              "fontfaceobserver",
+              "intl-tel-input",
+              "moment"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "4mb",
+                  "maximumError": "5mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -93,7 +101,8 @@
           "options": {
             "polyfills": [
               "zone.js",
-              "zone.js/testing"
+              "zone.js/testing",
+              "@skyux/packages/polyfills"
             ],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
@@ -102,6 +111,9 @@
               "src/assets"
             ],
             "styles": [
+              "@skyux/ag-grid/css/sky-ag-grid.css",
+              "@skyux/theme/css/sky.css",
+              "@skyux/theme/css/themes/modern/styles.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -109,5 +121,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }
