@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Globalization;
+using WeatherForecastService.Models;
 
 namespace WeatherForecastService.Controllers
 {
@@ -10,6 +11,7 @@ namespace WeatherForecastService.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly ILogger<WeatherForecastController> _logger;
+        private static readonly List<DemoItem> DemoItems = new();
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
@@ -43,6 +45,54 @@ namespace WeatherForecastService.Controllers
             else { return new List<WeatherDailyForecast>(); }
     
 
+        }
+
+        [HttpGet("demo-items")]
+        public ActionResult<List<DemoItem>> GetDemoItems()
+        {
+            return Ok(DemoItems);
+        }
+
+        [HttpDelete("demo-items")]
+        public ActionResult ClearDemoItems()
+        {
+            DemoItems.Clear();
+            return Ok();
+        }
+
+        [HttpPost("demo-items")]
+        public ActionResult<DemoItem> CreateDemoItem([FromBody] DemoItem item)
+        {
+            item.Id = DemoItems.Count + 1;
+            DemoItems.Add(item);
+            return Ok(item);
+        }
+
+        [HttpPut("demo-items/{id}")]
+        public ActionResult<DemoItem> UpdateDemoItem(int id, [FromBody] DemoItem updatedItem)
+        {
+            var existingItem = DemoItems.FirstOrDefault(i => i.Id == id);
+            if (existingItem == null)
+            {
+                return NotFound();
+            }
+
+            existingItem.Name = updatedItem.Name;
+            existingItem.Description = updatedItem.Description;
+            return Ok(existingItem);
+        }
+
+        [HttpDelete("demo-items/{id}")]
+        public ActionResult DeleteDemoItem(int id)
+        {
+            var item = DemoItems.FirstOrDefault(i => i.Id == id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            DemoItems.Remove(item);
+            return Ok();
         }
 
         private string GetDayWiseAverageHumidity(WeatherForecastModel weatherForecastModel, string date)

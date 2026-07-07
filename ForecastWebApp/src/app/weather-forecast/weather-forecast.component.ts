@@ -71,6 +71,12 @@ export class WeatherForecastComponent implements OnInit {
   }>;  
   protected isShowAlert = false;
   protected isShowAlertForDateRange = false;
+  protected demoItems: Array<{ id: number; name: string; description: string }> = [];
+  protected demoItemName = '';
+  protected demoItemDescription = '';
+  protected selectedDemoItemId: number | null = null;
+  protected demoMessage = '';
+  protected demoMessageType: 'success' | 'error' = 'success';
   #gridApi: GridApi | undefined;
   protected gridOptions: GridOptions;
 
@@ -176,6 +182,7 @@ export class WeatherForecastComponent implements OnInit {
   // Lifecycle Hooks... 
   public ngOnInit(): void {
     this.dateFormat = "YYYY-MM-DD";   
+    this.loadDemoItems();
     
     this.#subscriptions.add(
       this.#activatedRoute.queryParamMap
@@ -275,6 +282,83 @@ export class WeatherForecastComponent implements OnInit {
       .subscribe(response=>{this.weatherForecastList = response;})      
     }
   }  
+
+  protected get demoContextLabel(): string {
+    if (this.inputLatitude && this.inputLongitude) {
+      return `Location ${this.inputLatitude}, ${this.inputLongitude}`;
+    }
+
+    return 'current forecast window';
+  }
+
+  protected loadDemoItems(): void {
+    this._weatherForecastService.getDemoItems().subscribe((items) => {
+      this.demoItems = items;
+    });
+  }
+
+  protected saveDemoItem(): void {
+    if (!this.demoItemName.trim()) {
+      this.demoMessage = 'Please enter a note title before saving.';
+      this.demoMessageType = 'error';
+      return;
+    }
+
+    const payload = {
+      name: this.demoItemName.trim(),
+      description: this.demoItemDescription.trim() || 'No extra details provided.'
+    };
+
+    const successHandler = () => {
+      this.resetDemoForm();
+      this.loadDemoItems();
+      this.demoMessage = this.selectedDemoItemId ? 'Note updated for this forecast.' : 'Note added to the forecast plan.';
+      this.demoMessageType = 'success';
+    };
+
+    const errorHandler = () => {
+      this.demoMessage = 'The note could not be saved. Please try again.';
+      this.demoMessageType = 'error';
+    };
+
+    if (this.selectedDemoItemId) {
+      this._weatherForecastService.updateDemoItem(this.selectedDemoItemId, payload).subscribe({
+        next: successHandler,
+        error: errorHandler
+      });
+    } else {
+      this._weatherForecastService.createDemoItem(payload).subscribe({
+        next: successHandler,
+        error: errorHandler
+      });
+    }
+  }
+
+  protected editDemoItem(item: { id: number; name: string; description: string }): void {
+    this.selectedDemoItemId = item.id;
+    this.demoItemName = item.name;
+    this.demoItemDescription = item.description;
+  }
+
+  protected deleteDemoItem(id: number): void {
+    this._weatherForecastService.deleteDemoItem(id).subscribe({
+      next: () => {
+        this.loadDemoItems();
+        this.demoMessage = 'Note removed from the plan.';
+        this.demoMessageType = 'success';
+      },
+      error: () => {
+        this.demoMessage = 'The note could not be removed.';
+        this.demoMessageType = 'error';
+      }
+    });
+  }
+
+  protected resetDemoForm(): void {
+    this.selectedDemoItemId = null;
+    this.demoItemName = '';
+    this.demoItemDescription = '';
+  }
 
   protected getCurrentLocation() {
     return new Promise((resolve, reject) => {

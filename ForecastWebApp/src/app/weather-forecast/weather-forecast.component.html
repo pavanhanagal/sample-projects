@@ -121,8 +121,42 @@
         [pageSize]="pageSize"
         (currentPageChange)="onPageChange($event)"
         />    
-    </sky-ag-grid-wrapper>    
-        
-   
+    </sky-ag-grid-wrapper>
+
+    <div class="sky-margin-stacked-lg">
+        <h3>Forecast planning notes</h3>
+        <p class="sky-deemphasized">Capture follow-up actions for the forecast window you just loaded, such as preparation checks, travel plans, or weather alerts.</p>
+
+        <div class="sky-margin-stacked-sm">
+            <strong>Context:</strong> {{ demoContextLabel }}
+        </div>
+
+        <div class="sky-margin-stacked-sm">
+            <label class="sky-control-label">Note title</label>
+            <input class="sky-form-control" type="text" [(ngModel)]="demoItemName" name="demoItemName" />
+        </div>
+        <div class="sky-margin-stacked-sm">
+            <label class="sky-control-label">Details</label>
+            <input class="sky-form-control" type="text" [(ngModel)]="demoItemDescription" name="demoItemDescription" />
+        </div>
+        <div class="sky-margin-stacked-sm">
+            <button class="sky-btn sky-btn-primary" type="button" (click)="saveDemoItem()">{{ selectedDemoItemId ? 'Update note' : 'Save note' }}</button>
+            <button class="sky-btn sky-btn-default" type="button" (click)="resetDemoForm()" *ngIf="selectedDemoItemId">Cancel</button>
+        </div>
+
+        <div *ngIf="demoMessage" class="sky-margin-stacked-sm" [ngClass]="demoMessageType === 'success' ? 'sky-text-success' : 'sky-text-danger'">
+            {{ demoMessage }}
+        </div>
+
+        <ul class="sky-list-unstyled">
+            <li *ngFor="let item of demoItems" class="sky-margin-stacked-sm">
+                <div><strong>{{ item.name }}</strong> - {{ item.description }}</div>
+                <div>
+                    <button class="sky-btn sky-btn-link" type="button" (click)="editDemoItem(item)">Edit</button>
+                    <button class="sky-btn sky-btn-link" type="button" (click)="deleteDemoItem(item.id)">Delete</button>
+                </div>
+            </li>
+        </ul>
+    </div>
 
 
